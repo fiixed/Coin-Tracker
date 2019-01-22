@@ -450,7 +450,7 @@ class MyAppState extends State<MyApp> {
       theme: ThemeData.light(),
       home: Scaffold(
         appBar: AppBar(
-          title: Text('COIN TRACER'),
+          title: Text('COIN TRACKER'),
         ),
         body: Center(
           child: RefreshIndicator(
@@ -494,7 +494,53 @@ class MyAppState extends State<MyApp> {
                                             ),
                                           ],
                                         ),
+                                        Expanded(
+                                          child: Container(
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.end,
+                                              children: <Widget>[
+                                                Container(
+                                                  padding:
+                                                      const EdgeInsets.all(8.0),
+                                                  child: Text(
+                                                      '\$${double.parse(coin.price_usd).toStringAsFixed(2)}'),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
                                       ],
+                                    ),
+                                    Container(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: <Widget>[
+                                          Text(
+                                            '1h:${coin.percent_change_1h}%',
+                                            style: TextStyle(
+                                              color: getColor(
+                                                  coin.percent_change_1h),
+                                            ),
+                                          ),
+                                          Text(
+                                            '24h:${coin.percent_change_24h}%',
+                                            style: TextStyle(
+                                              color: getColor(
+                                                  coin.percent_change_24h),
+                                            ),
+                                          ),
+                                          Text(
+                                            '7d:${coin.percent_change_7d}%',
+                                            style: TextStyle(
+                                              color: getColor(
+                                                  coin.percent_change_7d),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
                                     ),
                                   ],
                                 ),
@@ -512,8 +558,18 @@ class MyAppState extends State<MyApp> {
     );
   }
 
-  Future<Null> refreshListCoin() {
+  getColor(String percent) {
+    if (percent != null && percent.contains('-')) {
+      return Colors.red;
+    } else {
+      return Colors.green;
+    }
+  }
+
+  Future<Null> refreshListCoin() async {
     refreshKey.currentState?.show(atTop: false);
+    await Future.delayed(Duration(seconds: 2));
+
     setState(() {
       list = fetchListCoin();
     });
@@ -542,14 +598,15 @@ class CoinMarket {
   final String percent_change_24h;
   final String percent_change_7d;
 
-  CoinMarket(
-      {this.id,
-      this.name,
-      this.symbol,
-      this.price_usd,
-      this.percent_change_1h,
-      this.percent_change_24h,
-      this.percent_change_7d});
+  CoinMarket({
+    this.id,
+    this.name,
+    this.symbol,
+    this.price_usd,
+    this.percent_change_1h,
+    this.percent_change_24h,
+    this.percent_change_7d,
+  });
 
   factory CoinMarket.fromJson(Map<String, dynamic> json) {
     return CoinMarket(
@@ -559,6 +616,6 @@ class CoinMarket {
         price_usd: json['price_usd'],
         percent_change_1h: json['percent_change_1h'],
         percent_change_24h: json['percent_change_24h'],
-        percent_change_7d: json['this.percent_change_7d']);
+        percent_change_7d: json['percent_change_7d']);
   }
 }
